@@ -8,6 +8,7 @@ function App() {
   const [socket, setSocket] = useState(null);
   const [textmsg, setMessage] = useState();
   const [userId, setUserId] = useState(uuid());
+  const [currentMsg, setCurrentMessage] = useState([]);
   useEffect(() => {
     setSocket(io("http://localhost:4000"));
   }, []);
@@ -22,11 +23,16 @@ function App() {
       };
       socket.emit('chat message', sendData);
       socket.on('chat message', function (msg) {
-        console.log("RECIEVED MESSAGFE ", msg , "your user id ",userId);
+        // console.log("RECIEVED MESSAGFE ", msg , "your user id ",userId);
+        console.log(" is your own message ",userId == msg.userId);
+        setCurrentMessage(oldArray => [...oldArray, msg])
       });
     }
   }, [socket]);
 
+  useEffect(()=>{
+    console.log(" MEAAAGFEEEEE ",currentMsg);
+  },[currentMsg])
   const sendMessage = () => {
     console.log("sending message! ", textmsg);
     const sendData = {
@@ -39,6 +45,9 @@ function App() {
     <div className="App">
       <input type="text" onChange={(e) => { setMessage(e.target.value) }}></input>
       <button onClick={() => { sendMessage() }}>Send</button>
+      {currentMsg.map((msg,i) =>(
+        <span key={i}>{msg.msg} <br></br></span>
+      ))}
     </div>
   );
 }
